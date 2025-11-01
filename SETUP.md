@@ -16,21 +16,19 @@
    - Go to Project Settings > API
    - Copy your Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - Copy your anon/public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - Go to Project Settings > Database
-   - Copy the Connection string (URI format) → `DATABASE_URL`
 
 4. **Create `.env` file**:
    ```env
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
    ```
 
 5. **Set up the database schema**:
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
+   - Go to your Supabase project dashboard
+   - Navigate to SQL Editor
+   - Copy and paste the contents of `supabase/migrations/001_initial_schema.sql`
+   - Click "Run" to execute the SQL script
+   - This will create the Contact and ContactEntry tables with proper Row Level Security policies
 
 6. **Run the development server**:
    ```bash
@@ -77,9 +75,9 @@
 ## Troubleshooting
 
 ### Database Connection Issues
-- Make sure your `DATABASE_URL` is in the correct format
 - Verify your Supabase project is active
-- Check that you've run `npx prisma db push`
+- Make sure you've run the SQL migration script in Supabase SQL Editor
+- Check that the tables `Contact` and `ContactEntry` exist in your Supabase database
 
 ### Authentication Issues
 - Verify your Supabase URL and anon key are correct

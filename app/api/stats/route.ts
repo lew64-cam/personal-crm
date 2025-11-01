@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET() {
@@ -9,9 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const totalContacts = await prisma.contact.count({
-      where: { userId: user.id },
-    });
+    const totalContacts = await db.countContacts(user.id);
 
     return NextResponse.json({ totalContacts });
   } catch (error: any) {

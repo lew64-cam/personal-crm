@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { getDaysUntilBirthday, getDaysSinceLastContact } from '@/lib/utils';
 
@@ -10,12 +10,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const contacts = await prisma.contact.findMany({
-      where: {
-        userId: user.id,
-        notificationEnabled: true,
-      },
-    });
+    const allContacts = await db.getContacts(user.id);
+    const contacts = allContacts.filter(contact => contact.notificationEnabled);
 
     const upcomingBirthdays = contacts
       .filter((contact) => contact.birthday)

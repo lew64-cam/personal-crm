@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(
@@ -16,31 +16,18 @@ export async function POST(
     const body = await request.json();
 
     // Verify contact belongs to user
-    const contact = await prisma.contact.findFirst({
-      where: {
-        id,
-        userId: user.id,
-      },
-    });
+    const contact = await db.getContact(id, user.id);
 
     if (!contact) {
       return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
     }
 
     // Update lastContacted
-    await prisma.contact.update({
-      where: { id },
-      data: { lastContacted: new Date() },
-    });
+    await db.updateContact(id, user.id, { lastContacted: new Date() });
 
     // Create entry if content provided
     if (body.content) {
-      const entry = await prisma.contactEntry.create({
-        data: {
-          contactId: id,
-          content: body.content,
-        },
-      });
+      const entry = await db.createContactEntry(id, body.content);
       return NextResponse.json(entry, { status: 201 });
     }
 

@@ -63,7 +63,6 @@ A modern personal CRM application built with Next.js, Supabase, and Prisma to he
 3. **Set up Supabase**:
    - Create a new project at [supabase.com](https://supabase.com)
    - Go to Project Settings > API to get your project URL and anon key
-   - Go to Project Settings > Database > Connection string to get your database connection string
 
 4. **Configure environment variables**:
    
@@ -71,16 +70,13 @@ A modern personal CRM application built with Next.js, Supabase, and Prisma to he
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   DATABASE_URL=your_supabase_database_connection_string
    ```
 
 5. **Set up the database**:
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
-
-   This will create the database schema in your Supabase database.
+   - Go to your Supabase project dashboard
+   - Navigate to SQL Editor
+   - Copy and paste the contents of `supabase/migrations/001_initial_schema.sql`
+   - Run the SQL script to create the database tables and policies
 
 6. **Run the development server**:
    ```bash
@@ -180,7 +176,6 @@ personal-crm/
 Make sure to set all environment variables in your hosting platform:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `DATABASE_URL`
 
 ## License
 

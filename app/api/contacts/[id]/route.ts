@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(
@@ -13,17 +13,7 @@ export async function GET(
     }
 
     const { id } = await params;
-    const contact = await prisma.contact.findFirst({
-      where: {
-        id,
-        userId: user.id,
-      },
-      include: {
-        entries: {
-          orderBy: { createdAt: 'desc' },
-        },
-      },
-    });
+    const contact = await db.getContact(id, user.id);
 
     if (!contact) {
       return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
@@ -53,13 +43,7 @@ export async function PATCH(
       body.tags = body.tags.join(', ');
     }
 
-    const contact = await prisma.contact.update({
-      where: {
-        id,
-        userId: user.id,
-      },
-      data: body,
-    });
+    const contact = await db.updateContact(id, user.id, body);
 
     return NextResponse.json(contact);
   } catch (error: any) {
@@ -78,12 +62,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.contact.delete({
-      where: {
-        id,
-        userId: user.id,
-      },
-    });
+    await db.deleteContact(id, user.id);
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
