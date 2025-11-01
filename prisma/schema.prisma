@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Contact {
+  id                    String    @id @default(cuid())
+  userId                String    // Supabase auth user ID
+  name                  String
+  birthday              String?   // Stored as MM-DD string
+  jobTitle              String?
+  company               String?
+  location              String?
+  email                 String?
+  phone                 String?
+  howWeMet              String?
+  relationshipType      String?   // mentor, colleague, friend, family, professional
+  notes                 String?   // General notes
+  linkedInUrl           String?
+  twitterUrl            String?
+  personalWebsiteUrl    String?
+  tags                  String    @default("") // Comma-separated tags
+  lastContacted         DateTime?
+  reachOutIntervalDays  Int?      // Custom interval in days (e.g., 30 for monthly)
+  birthdayReminderDays  Int       @default(0) // Days before birthday to remind (0 = day of, 1 = 1 day before, etc.)
+  notificationEnabled   Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Timestamped notes/entries
+  entries               ContactEntry[]
+
+  @@index([userId])
+  @@index([relationshipType])
+  @@index([tags])
+}
+
+model ContactEntry {
+  id        String   @id @default(cuid())
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([contactId])
+}
