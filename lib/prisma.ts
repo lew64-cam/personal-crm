@@ -38,6 +38,19 @@ export interface ContactEntry {
   createdAt: Date;
 }
 
+export interface UserPreferences {
+  id: string;
+  userId: string;
+  digestEnabled: boolean;
+  digestFrequency: 'daily' | 'weekly';
+  digestEmail: string | null;
+  digestSendHour: number;
+  digestDayOfWeek: number;
+  lastDigestSentAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Database helper functions using Supabase
 export const db = {
   async getContacts(userId: string, filters?: {
@@ -228,6 +241,70 @@ export const db = {
       ...entry,
       createdAt: new Date(entry.createdAt),
     } as ContactEntry;
+  },
+
+  async getContactEntriesInRange(userId: string, startDate: Date, endDate: Date) {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('ContactEntry')
+      .select('*, Contact!inner(userId, name, id)')
+      .eq('Contact.userId', userId)
+      .gte('createdAt', startDate.toISOString())
+      .lte('createdAt', endDate.toISOString());
+
+    if (error) throw error;
+    return (data || []).map((entry: any) => ({
+      id: entry.id,
+      contactId: entry.contactId,
+      contactName: entry.Contact?.name as string,
+      content: entry.content,
+      createdAt: new Date(entry.createdAt),
+    }));
+  },
+
+  async getUserPreferences(userId: string): Promise<UserPreferences | null> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('userId', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+    if (!data) return null;
+
+    return {
+      ...data,
+      lastDigestSentAt: data.lastDigestSentAt ? new Date(data.lastDigestSentAt) : null,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+    } as UserPreferences;
+  },
+
+  async upsertUserPreferences(
+    userId: string,
+    updates: Partial<Omit<UserPreferences, 'id' | 'userId' | 'createdAt' | 'updatedAt'>>
+  ): Promise<UserPreferences> {
+    const supabase = await createClient();
+    const now = new Date().toISOString();
+    const id = generateId();
+
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .upsert(
+        { id, userId, ...updates, updatedAt: now },
+        { onConflict: 'userId' }
+      )
+      .select()
+      .single();
+
+    if (error) throw error;
+    return {
+      ...data,
+      lastDigestSentAt: data.lastDigestSentAt ? new Date(data.lastDigestSentAt) : null,
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+    } as UserPreferences;
   },
 };
 

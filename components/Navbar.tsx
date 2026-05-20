@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, Calendar } from 'lucide-react';
 import { DarkModeToggle } from './DarkModeToggle';
 
 export function Navbar() {
@@ -34,6 +34,13 @@ export function Navbar() {
                 className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 Contacts
+              </Link>
+              <Link
+                href="/calendar"
+                className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
+              >
+                <Calendar className="w-4 h-4" />
+                Calendar
               </Link>
               <Link
                 href="/settings"

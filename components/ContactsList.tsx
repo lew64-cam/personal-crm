@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, Plus, Filter, Tag, Building, MapPin } from 'lucide-react';
+import { Search, Plus, Download, Upload, Building, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { QuickAddModal } from './QuickAddModal';
+import { CsvImportModal } from './CsvImportModal';
 import { parseTags } from '@/lib/utils';
 
 interface Contact {
@@ -26,6 +27,7 @@ export function ContactsList() {
   const [filterTag, setFilterTag] = useState<string>('');
   const [filterCompany, setFilterCompany] = useState<string>('');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
   useEffect(() => {
     fetchContacts();
@@ -59,13 +61,29 @@ export function ContactsList() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Contacts</h1>
-        <button
-          onClick={() => setShowQuickAdd(true)}
-          className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Add Contact</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.location.href = '/api/contacts/export'}
+            className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-sm transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={() => setShowImport(true)}
+            className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-3 py-2 rounded-lg text-sm transition-colors"
+          >
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </button>
+          <button
+            onClick={() => setShowQuickAdd(true)}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Add Contact
+          </button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -183,6 +201,7 @@ export function ContactsList() {
       )}
 
       <QuickAddModal isOpen={showQuickAdd} onClose={() => setShowQuickAdd(false)} onSuccess={fetchContacts} />
+      <CsvImportModal isOpen={showImport} onClose={() => setShowImport(false)} onSuccess={fetchContacts} />
     </div>
   );
 }
