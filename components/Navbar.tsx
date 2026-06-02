@@ -41,6 +41,12 @@ export function Navbar() {
               >
                 Settings
               </Link>
+              <Link
+                href="/piano-game"
+                className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                🎹 Piano Game
+              </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">
